@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>La Overa - Carta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Bebas+Neue&family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700;800&family=Manrope:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1e8d0;
+    --card: #b04948;
+    --card-hover: #9a3f3e;
+    --navbar: #181513;
+    --text-dark: #2a1f15;
+    --text-light: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.78);
+    --accent: #e8c977;
+    --modal-bg: rgba(15, 12, 10, 0.92);
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    --shadow-hover: 0 14px 36px rgba(0, 0, 0, 0.22);
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-dark);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* TOP NAV */
+  .topbar {
+    background: var(--navbar);
+    color: var(--text-light);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar .brand {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    opacity: 0.65;
+    text-transform: uppercase;
+  }
+  .topbar .resto-logo {
+    font-family: var(--font-display);
+    color: var(--card);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .topbar .resto-logo img { height: 36px; }
+
+  /* HOME VIEW */
+  #home {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  #home .big-logo {
+    font-family: var(--font-display);
+    color: var(--card);
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+  #home .big-logo img { max-width: 280px; max-height: 220px; }
+  #home .tagline {
+    font-size: 13px;
+    color: var(--navbar);
+    opacity: 0.6;
+    margin-bottom: 48px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  #home .menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 380px;
+  }
+  .menu-btn {
+    background: var(--navbar);
+    color: var(--text-light);
+    border: none;
+    padding: 20px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    text-transform: uppercase;
+    font-family: var(--font-body);
+  }
+  .menu-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.16); }
+  .menu-btn:active { transform: translateY(0); }
+  #home .footer-info {
+    margin-top: 48px;
+    font-size: 12px;
+    color: var(--navbar);
+    opacity: 0.5;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* MENU VIEW */
+  #menu-view { display: none; padding-bottom: 100px; }
+  .cat-nav {
+    background: var(--bg);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    padding: 16px 20px;
+    position: sticky;
+    top: 64px;
+    z-index: 50;
+  }
+  .cat-nav::-webkit-scrollbar { display: none; }
+  .cat-nav .cat-link {
+    display: inline-block;
+    padding: 8px 0;
+    margin-right: 28px;
+    color: #000000;
+    opacity: 1;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .cat-nav .cat-link:hover { color: var(--card); }
+  .cat-nav .cat-link.active {
+    border-bottom-color: var(--card);
+    color: var(--card);
+  }
+
+  .cat-section { padding: 24px 20px 4px; max-width: 1600px; margin: 0 auto; scroll-margin-top: 116px; }
+  .cat-section h2 {
+    font-family: var(--font-display);
+    color: var(--card);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+  }
+  .items-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  @media (min-width: 720px) { .items-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1080px) { .items-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  @media (min-width: 1440px) { .items-grid { grid-template-columns: 1fr 1fr 1fr 1fr; } }
+
+  .item-card {
+    background: var(--card);
+    color: var(--text-light);
+    border-radius: var(--radius);
+    border: 1.5px solid rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    display: flex;
+    min-height: 124px;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  }
+  .item-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); background: var(--card-hover); border-color: rgba(0, 0, 0, 0.5); }
+  .item-card .item-info { flex: 1; padding: 16px 16px 16px 18px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+  .item-card .item-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+  .item-card .item-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    flex: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 400;
+  }
+  .item-card .item-price {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 10px;
+    letter-spacing: 0.3px;
+  }
+  .item-card .item-photo {
+    width: 124px;
+    min-width: 124px;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(0,0,0,0.15);
+  }
+  .item-card .badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 5px 10px;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    border-bottom-left-radius: 8px;
+    z-index: 2;
+  }
+  .item-card.no-photo { min-height: auto; }
+  .item-card.no-photo .item-photo { display: none; }
+  .item-card.no-photo .item-info { padding: 16px 18px; }
+
+  /* BACK BUTTON */
+  .back-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 44px;
+    height: 44px;
+    background: rgba(40, 30, 20, 0.85);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 60;
+    box-shadow: var(--shadow);
+  }
+
+  /* MODAL */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--modal-bg);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--card);
+    color: #fff;
+    border-radius: 14px;
+    max-width: 440px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  .modal-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+  }
+  .modal-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(0,0,0,0.15);
+  }
+  .modal-img.no-img { display: none; }
+  .modal-body {
+    padding: 22px 24px 28px;
+    text-align: center;
+    border-top: 4px solid rgba(255,255,255,0.15);
+  }
+  .modal-cat { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.75; margin-bottom: 10px; }
+  .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .modal-desc { font-size: 14px; line-height: 1.5; opacity: 0.9; margin-bottom: 18px; }
+  .modal-price { font-size: 18px; font-weight: 700; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b5b48;
+  }
+  .empty-state h3 { margin-bottom: 8px; color: var(--text-dark); }
+  .empty-state a { color: var(--card); text-decoration: none; font-weight: 600; }
+
+  /* ============ MOBILE (≤720px) ============ */
+  @media (max-width: 720px) {
+    /* Topbar más compacta */
+    .topbar { padding: 11px 16px; }
+    .topbar .brand { font-size: 11px; letter-spacing: 1.3px; }
+    .topbar .resto-logo { font-size: 18px; letter-spacing: 0.8px; }
+    .topbar .resto-logo img { height: 28px; }
+
+    /* Home más ajustado */
+    #home {
+      min-height: calc(100vh - 48px);
+      padding: 28px 22px;
+    }
+    #home .big-logo {
+      font-size: 52px;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+    }
+    #home .big-logo img { max-width: 200px; max-height: 170px; }
+    #home .tagline {
+      font-size: 11px;
+      letter-spacing: 3px;
+      margin-bottom: 36px;
+    }
+    #home .menu-buttons { gap: 11px; }
+    .menu-btn {
+      padding: 18px 22px;
+      font-size: 14px;
+      letter-spacing: 2.5px;
+    }
+    #home .footer-info {
+      margin-top: 36px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+    }
+
+    /* Cat-nav: scroll horizontal optimizado, touch friendly */
+    .cat-nav {
+      padding: 12px 16px;
+      top: 48px;
+    }
+    .cat-nav .cat-link {
+      margin-right: 22px;
+      font-size: 12px;
+      letter-spacing: 1.2px;
+      padding: 8px 0;
+    }
+
+    /* Categorías y cards */
+    .cat-section { padding: 18px 14px 4px; scroll-margin-top: 100px; }
+    .cat-section h2 {
+      font-size: 20px;
+      letter-spacing: 1.5px;
+      margin-bottom: 14px;
+    }
+    .items-grid {
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .item-card {
+      min-height: 108px;
+      border-radius: 10px;
+    }
+    .item-card .item-info {
+      padding: 12px 12px 12px 14px;
+    }
+    .item-card .item-title {
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+      line-height: 1.2;
+    }
+    .item-card .item-desc {
+      font-size: 11.5px;
+      line-height: 1.35;
+      letter-spacing: 0.3px;
+      -webkit-line-clamp: 2;
+    }
+    .item-card .item-price {
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .item-card .item-photo {
+      width: 102px;
+      min-width: 102px;
+    }
+    .item-card .badge {
+      font-size: 9.5px;
+      padding: 4px 8px;
+      border-bottom-left-radius: 6px;
+    }
+
+    /* Back button más a mano */
+    .back-btn {
+      bottom: 18px;
+      left: 16px;
+      width: 46px;
+      height: 46px;
+    }
+
+    /* Modal casi fullscreen en mobile */
+    .modal-backdrop { padding: 12px; }
+    .modal {
+      max-width: 100%;
+      max-height: 92vh;
+      border-radius: 14px;
+    }
+    .modal-img { aspect-ratio: 4 / 3; height: auto; }
+    .modal-body {
+      padding: 18px 20px 24px;
+    }
+    .modal-cat {
+      font-size: 10.5px;
+      letter-spacing: 1.8px;
+      margin-bottom: 8px;
+    }
+    .modal-title {
+      font-size: 18px;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+    .modal-desc {
+      font-size: 13.5px;
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+    .modal-price { font-size: 17px; }
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      top: 14px;
+      left: 14px;
+      font-size: 20px;
+    }
+  }
+
+  /* Pantallas muy chicas (≤380px, iPhone SE/Mini) */
+  @media (max-width: 380px) {
+    .topbar { padding: 10px 14px; }
+    .topbar .resto-logo { font-size: 16px; }
+    #home .big-logo { font-size: 44px; letter-spacing: 2.5px; }
+    .cat-nav .cat-link { margin-right: 18px; font-size: 11.5px; }
+    .cat-section h2 { font-size: 18px; }
+    .item-card { min-height: 100px; }
+    .item-card .item-photo { width: 92px; min-width: 92px; }
+    .item-card .item-info { padding: 11px 11px 11px 13px; }
+    .item-card .item-title { font-size: 12.5px; }
+    .item-card .item-desc { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">CARTA DIGITAL</div>
+  <div class="resto-logo" id="topbar-logo">La Overa</div>
+</div>
+
+<!-- HOME VIEW -->
+<div id="home">
+  <div class="big-logo" id="home-logo">La Overa</div>
+  <div class="tagline" id="home-tagline">RESTAURANT · TALCA</div>
+  <div class="menu-buttons" id="menu-buttons"></div>
+  <div class="footer-info" id="footer-info">Lunes a Domingo · 12:30 a 21:00</div>
+</div>
+
+<!-- MENU VIEW -->
+<div id="menu-view">
+  <div class="cat-nav" id="cat-nav"></div>
+  <div id="cat-content"></div>
+</div>
+
+<button class="back-btn" id="back-btn" style="display:none" aria-label="Volver">&larr;</button>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Cerrar">&times;</button>
+    <div class="modal-badge" id="modal-badge" style="display:none"></div>
+    <div class="modal-img" id="modal-img"></div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modal-cat"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-price" id="modal-price"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'laovera_carta_v3';
+
+const DEFAULT_THEME = {
+  font: 'Inter',
+  bgColor: '#f1e8d0',
+  navColor: '#181513',
+  cardColor: '#b04948',
+  textColor: '#ffffff',
+  accentColor: '#e8c977'
+};
+
+const DEFAULT_DATA = {
+  config: {
+    name: 'La Overa',
+    tagline: 'RESTAURANTE · TALCA',
+    footer: 'Lunes a Domingo · 12:30 a 21:00',
+    logo: '',
+    menus: ['Restaurante', 'Sandwichería', 'Barra'],
+    theme: { ...DEFAULT_THEME }
+  },
+  categories: [
+    { id: 'c01', menu: 'Restaurante', name: 'Para Empezar', order: 1, active: true },
+    { id: 'c02', menu: 'Restaurante', name: 'Ensaladas', order: 2, active: true },
+    { id: 'c03', menu: 'Restaurante', name: 'Carnes a la Plancha', order: 3, active: true },
+    { id: 'c04', menu: 'Restaurante', name: 'Sugerencias', order: 4, active: true },
+    { id: 'c05', menu: 'Restaurante', name: 'Acompañamientos', order: 5, active: true },
+    { id: 'c06', menu: 'Restaurante', name: 'Menú Niños', order: 6, active: true },
+    { id: 'c07', menu: 'Restaurante', name: 'Salsas', order: 7, active: true },
+    { id: 'c08', menu: 'Restaurante', name: 'Postres', order: 8, active: true },
+    { id: 'c09', menu: 'Restaurante', name: 'Burgers La Overa', order: 9, active: true },
+    { id: 'c10', menu: 'Sandwichería', name: 'Sandwiches Churrasco', order: 1, active: true },
+    { id: 'c11', menu: 'Sandwichería', name: 'Sandwiches Not Burger', order: 2, active: true },
+    { id: 'c12', menu: 'Sandwichería', name: 'Agregados', order: 3, active: true },
+    { id: 'c13', menu: 'Sandwichería', name: 'Para Picar', order: 4, active: true },
+    { id: 'c14', menu: 'Barra', name: 'Bebidas y Aguas', order: 1, active: true },
+    { id: 'c15', menu: 'Barra', name: 'Jugos', order: 2, active: true },
+    { id: 'c16', menu: 'Barra', name: 'Destilados', order: 3, active: true },
+    { id: 'c17', menu: 'Barra', name: 'Cervezas', order: 4, active: true },
+    { id: 'c18', menu: 'Barra', name: 'Vinos', order: 5, active: true },
+    { id: 'c19', menu: 'Barra', name: 'Vinos por Copa', order: 6, active: true },
+    { id: 'c20', menu: 'Barra', name: 'Cafetería', order: 7, active: true }
+  ],
+  items: [
+    { id: 'i01', categoryId: 'c01', name: 'Ceviche de Salmón', description: 'Salmón y camarón. Acompañado de cilantro, cebolla morada y rocotto.', price: 9900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i02', categoryId: 'c01', name: 'Crudo de Res', description: 'Crudo de res con alcaparras, cebolla morada, cilantro, pepinillos y mayonesa. Acompañado de tostadas hechas en casa.', price: 9900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i03', categoryId: 'c01', name: 'Empanadas de Queso', description: '6 unidades.', price: 5900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i04', categoryId: 'c02', name: 'Ensalada Chilena', description: 'Tomate acompañado con cebolla en pluma, ají verde y cilantro.', price: 4200, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i05', categoryId: 'c02', name: 'Ensalada del Huerto', description: 'Base de hojas verdes, tomate cherry y cebolla morada.', price: 4600, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i06', categoryId: 'c02', name: 'Ensalada César Pollo', description: 'Lechuga, crutones, parmesano y pollo. Con aliño césar.', price: 7900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i07', categoryId: 'c02', name: 'Ensalada César Camarón', description: 'Lechuga, crutones, parmesano y camarones. Con aliño césar.', price: 7900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i08', categoryId: 'c02', name: 'Palta Palmito', description: 'Láminas de palta y palmitos frescos.', price: 4900, photo: '', active: true, badge: 'Nuevo', order: 5 },
+    { id: 'i09', categoryId: 'c03', name: 'Prietas', description: '2 unidades.', price: 4900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i10', categoryId: 'c03', name: 'Longanizas', description: '2 unidades.', price: 6900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i11', categoryId: 'c03', name: 'Prietas y Longanizas', description: '1 unidad de cada uno.', price: 5900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i12', categoryId: 'c03', name: 'Plateada al Jugo', description: 'Plateada de vacuno de 250 grs aprox.', price: 10900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i13', categoryId: 'c03', name: 'Salmón a la Plancha', description: '180-200 grs aprox.', price: 9900, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i14', categoryId: 'c03', name: 'Atún Sellado', description: '200 grs aprox.', price: 9900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i15', categoryId: 'c03', name: 'Pollo a la Plancha', description: '250-300 grs aprox.', price: 7900, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i16', categoryId: 'c03', name: 'Lomo Vetado', description: '250 grs aprox.', price: 12500, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i17', categoryId: 'c03', name: 'Filete', description: '200 grs aprox.', price: 13900, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i18', categoryId: 'c03', name: 'Chuleta de Cerdo', description: '250 grs aprox.', price: 7900, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i19', categoryId: 'c03', name: 'Lomo Liso', description: '250 grs aprox.', price: 11500, photo: '', active: true, badge: '', order: 11 },
+    { id: 'i20', categoryId: 'c04', name: 'Gnocchis La Overa', description: 'Gnocchis de papas con salsa de pesto genovés y filetillos de pollo.', price: 9900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i21', categoryId: 'c04', name: 'Cazuela de Vacuno', description: 'Cazuela de osobuco de vacuno.', price: 9900, photo: '', active: true, badge: 'Más vendido', order: 2 },
+    { id: 'i22', categoryId: 'c04', name: 'Rigate La Overa', description: 'Pasta penne rigate con filete, camarones y champiñón. En salsa pomodoro.', price: 10900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i23', categoryId: 'c04', name: 'Chorrillana', description: '200 grs de churrasco, 300 grs de papas fritas, 100 grs de cebolla frita y 2 huevos.', price: 11500, photo: '', active: true, badge: 'Nuevo', order: 4 },
+    { id: 'i24', categoryId: 'c04', name: 'Filete con Fetuccini a la Huancaína', description: '150 grs de filete con fetuccini en salsa clásica peruana huancaína.', price: 14900, photo: '', active: true, badge: 'Nuevo', order: 5 },
+    { id: 'i25', categoryId: 'c04', name: 'Pulpo Anticuchero', description: 'Pulpo crocante en salsa a la huancaína, acompañado con papas a la provenzal en zarza criolla.', price: 14900, photo: '', active: true, badge: 'Nuevo', order: 6 },
+    { id: 'i26', categoryId: 'c04', name: 'Asado de Tira al Vino Tinto y Pastelera', description: '200 grs de asado de tira braseado al vino tinto, junto a pastelera de choclo.', price: 14900, photo: '', active: true, badge: 'Nuevo', order: 7 },
+    { id: 'i27', categoryId: 'c05', name: 'A lo Pobre', description: 'Papas fritas, cebolla y 2 huevos fritos.', price: 4200, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i28', categoryId: 'c05', name: 'Arroz', description: '', price: 2500, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i29', categoryId: 'c05', name: 'Papas Fritas', description: '200 grs.', price: 2500, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i30', categoryId: 'c05', name: 'Papas Cocidas', description: '3 unidades.', price: 2900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i31', categoryId: 'c05', name: 'Puré de Papas', description: '', price: 3500, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i32', categoryId: 'c05', name: 'Puré Picante', description: '', price: 3500, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i33', categoryId: 'c05', name: 'Huevos Fritos', description: '2 unidades.', price: 2200, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i34', categoryId: 'c05', name: 'Papas Mayo', description: '', price: 3500, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i35', categoryId: 'c06', name: 'Pollo Grill', description: 'Pollo grillado a la plancha con papas fritas.', price: 5900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i36', categoryId: 'c06', name: 'Nuggets con Puré de Papas', description: 'Puré de papas con 5 unidades de nuggets.', price: 4900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i37', categoryId: 'c06', name: 'Cheese Simple + Papas Fritas', description: 'Hamburguesa con queso cheddar y papas fritas.', price: 6900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i38', categoryId: 'c07', name: 'Salsa de Champiñón', description: 'Para acompañar carne.', price: 2400, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i39', categoryId: 'c07', name: 'Salsa de Vino', description: 'Para acompañar carne.', price: 2200, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i40', categoryId: 'c08', name: 'Brownie con Helado', description: 'Brownie tibio en salsa toffee acompañado de helado de vainilla.', price: 4900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i41', categoryId: 'c08', name: 'Celestino', description: 'Panqueques con manjar y helado.', price: 3900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i42', categoryId: 'c08', name: 'Helado 2 Sabores', description: 'Bocados de helado sabor chocolate o vainilla.', price: 2900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i43', categoryId: 'c08', name: 'Cheescake de Berries', description: 'Dulce de queso estilo NY, cubierto con salsa de frutos rojos.', price: 5500, photo: '', active: true, badge: 'Nuevo', order: 4 },
+    { id: 'i44', categoryId: 'c08', name: 'Leche Asada', description: 'Crema horneada de leche, huevos y azúcar, aromatizada con vainilla, de textura suave y firme, con superficie levemente caramelizada.', price: 4900, photo: '', active: true, badge: 'Nuevo', order: 5 },
+    { id: 'i45', categoryId: 'c08', name: 'Churros', description: 'Churros con salsa de manjar y salsa de frutos rojos.', price: 4900, photo: '', active: true, badge: 'Nuevo', order: 6 },
+    { id: 'i46', categoryId: 'c09', name: 'American Simple', description: 'Pan de papa, hamburguesa 130 grs, queso cheddar, tocino, cebolla caramelizada, salsa overa.', price: 7400, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i47', categoryId: 'c09', name: 'American Doble', description: 'Pan de papa, doble hamburguesa 130 grs, queso cheddar, tocino, cebolla caramelizada, salsa overa.', price: 9200, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i48', categoryId: 'c09', name: 'Spicy Simple', description: 'Pan de papa, hamburguesa 130 grs, doble queso cheddar, tocino, ají cherry pepper, salsa overa.', price: 7400, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i49', categoryId: 'c09', name: 'Spicy Doble', description: 'Pan de papa, doble hamburguesa 130 grs, doble queso cheddar, tocino, ají cherry pepper, salsa overa.', price: 9200, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i50', categoryId: 'c09', name: 'Overa Simple', description: 'Pan de papa, hamburguesa 130 grs, pepinillo dill, mermelada de tocino, queso cheddar, salsa overa.', price: 7400, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i51', categoryId: 'c09', name: 'Overa Doble', description: 'Pan de papa, doble hamburguesa 130 grs, pepinillo dill, mermelada de tocino, queso cheddar, salsa overa.', price: 9200, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i52', categoryId: 'c09', name: 'Blue Simple', description: 'Pan de papa, hamburguesa 130 grs, queso azul, cebolla caramelizada, rúcula, mayonesa.', price: 7400, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i53', categoryId: 'c09', name: 'Blue Doble', description: 'Pan de papa, doble hamburguesa 130 grs, queso azul, cebolla caramelizada, rúcula, mayonesa.', price: 9200, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i54', categoryId: 'c09', name: 'Clásica Simple', description: 'Pan de papa, hamburguesa 130 grs, queso cheddar, tomate, lechuga, salsa overa.', price: 7400, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i55', categoryId: 'c09', name: 'Clásica Doble', description: 'Pan de papa, doble hamburguesa 130 grs, queso cheddar, tomate, lechuga, salsa overa.', price: 9200, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i56', categoryId: 'c10', name: 'Churrasco Solo', description: '', price: 5900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i57', categoryId: 'c10', name: 'Churrasco Tomate', description: '', price: 6200, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i58', categoryId: 'c10', name: 'Churrasco Tomate-Mayo', description: '', price: 6800, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i59', categoryId: 'c10', name: 'Churrasco Tomate-Palta', description: '', price: 7900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i60', categoryId: 'c10', name: 'Churrasco Palta', description: '', price: 7400, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i61', categoryId: 'c10', name: 'Churrasco Palta-Mayo', description: '', price: 7900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i62', categoryId: 'c10', name: 'Churrasco Italiano', description: 'Tomate, palta y mayonesa.', price: 8300, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i63', categoryId: 'c10', name: 'Churrasco Chacarero', description: 'Tomate, ají verde y poroto verde.', price: 7200, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i64', categoryId: 'c10', name: 'Churrasco Barros Luco', description: 'Queso fundido.', price: 8700, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i65', categoryId: 'c11', name: 'Not Burger Solo', description: '', price: 4900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i66', categoryId: 'c11', name: 'Not Burger Tomate', description: '', price: 5600, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i67', categoryId: 'c11', name: 'Not Burger Tomate-Mayo', description: '', price: 5800, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i68', categoryId: 'c11', name: 'Not Burger Tomate-Palta', description: '', price: 6900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i69', categoryId: 'c11', name: 'Not Burger Palta', description: '', price: 6600, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i70', categoryId: 'c11', name: 'Not Burger Palta-Mayo', description: '', price: 6900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i71', categoryId: 'c11', name: 'Not Burger Italiano', description: 'Tomate, palta y mayonesa.', price: 7300, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i72', categoryId: 'c11', name: 'Not Burger Chacarero', description: 'Tomate, ají verde y poroto verde.', price: 6500, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i73', categoryId: 'c12', name: 'Mayonesa', description: '', price: 600, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i74', categoryId: 'c12', name: 'Ají Verde', description: '', price: 600, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i75', categoryId: 'c12', name: 'Salsa BBQ', description: '', price: 600, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i76', categoryId: 'c12', name: 'Salsa Overa', description: '', price: 600, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i77', categoryId: 'c12', name: 'Tomate', description: '', price: 800, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i78', categoryId: 'c12', name: 'Palta', description: '', price: 1200, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i79', categoryId: 'c12', name: 'Poroto Verde', description: '', price: 1200, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i80', categoryId: 'c12', name: 'Lechuga', description: '', price: 600, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i81', categoryId: 'c12', name: 'Queso', description: '', price: 1200, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i82', categoryId: 'c12', name: 'Tocino', description: '', price: 1200, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i83', categoryId: 'c12', name: 'Pepinillo', description: '', price: 1200, photo: '', active: true, badge: '', order: 11 },
+    { id: 'i84', categoryId: 'c12', name: 'Cebolla Cruda', description: '', price: 600, photo: '', active: true, badge: '', order: 12 },
+    { id: 'i85', categoryId: 'c12', name: 'Cebolla Caramelizada', description: '', price: 600, photo: '', active: true, badge: '', order: 13 },
+    { id: 'i86', categoryId: 'c13', name: 'Aros de Cebolla (4 unidades)', description: '4 unidades.', price: 1200, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i87', categoryId: 'c13', name: 'Aros de Cebolla (6 unidades)', description: '6 unidades.', price: 1600, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i88', categoryId: 'c14', name: 'Coca Cola 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i89', categoryId: 'c14', name: 'Coca Cola Light 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i90', categoryId: 'c14', name: 'Coca Cola Zero 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i91', categoryId: 'c14', name: 'Coca Cola 220cc', description: '', price: 1700, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i92', categoryId: 'c14', name: 'Coca Cola Light 220cc', description: '', price: 1700, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i93', categoryId: 'c14', name: 'Coca Cola Zero 220cc', description: '', price: 1700, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i94', categoryId: 'c14', name: 'Coca Cola 591cc', description: '', price: 2800, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i95', categoryId: 'c14', name: 'Sprite 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i96', categoryId: 'c14', name: 'Sprite Zero 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i97', categoryId: 'c14', name: 'Sprite 591cc', description: '', price: 2800, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i98', categoryId: 'c14', name: 'Fanta 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 11 },
+    { id: 'i99', categoryId: 'c14', name: 'Fanta Zero 350cc', description: '', price: 2300, photo: '', active: true, badge: '', order: 12 },
+    { id: 'i100', categoryId: 'c14', name: 'Fanta 591cc', description: '', price: 2800, photo: '', active: true, badge: '', order: 13 },
+    { id: 'i101', categoryId: 'c14', name: 'Agua con Gas', description: '', price: 2000, photo: '', active: true, badge: '', order: 14 },
+    { id: 'i102', categoryId: 'c14', name: 'Agua sin Gas', description: '', price: 2000, photo: '', active: true, badge: '', order: 15 },
+    { id: 'i103', categoryId: 'c15', name: 'Jugo Guallarauco Naranja', description: '', price: 2500, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i104', categoryId: 'c15', name: 'Jugo Guallarauco Frutilla-Ciruela', description: '', price: 2500, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i105', categoryId: 'c15', name: 'Jugo Guallarauco Manzana', description: '', price: 2500, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i106', categoryId: 'c15', name: 'Jugo Guallarauco Mango', description: '', price: 2500, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i107', categoryId: 'c15', name: 'Jugo Guallarauco Piña-Naranja-Mango', description: '', price: 2500, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i108', categoryId: 'c15', name: 'Jugo Andina Durazno', description: '', price: 1800, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i109', categoryId: 'c15', name: 'Jugo Andina Naranja', description: '', price: 1800, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i110', categoryId: 'c15', name: 'Jugo Andina Piña', description: '', price: 1800, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i111', categoryId: 'c15', name: 'Jugo Natural Melón Tuna', description: '', price: 2900, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i112', categoryId: 'c15', name: 'Jugo Natural Frambuesa', description: '', price: 2900, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i113', categoryId: 'c15', name: 'Jugo Natural Frutilla', description: '', price: 2900, photo: '', active: true, badge: '', order: 11 },
+    { id: 'i114', categoryId: 'c15', name: 'Jugo Natural Mango', description: '', price: 2900, photo: '', active: true, badge: '', order: 12 },
+    { id: 'i115', categoryId: 'c15', name: 'Jugo Natural Maracuyá', description: '', price: 2900, photo: '', active: true, badge: '', order: 13 },
+    { id: 'i116', categoryId: 'c15', name: 'Limonada', description: '', price: 2900, photo: '', active: true, badge: '', order: 14 },
+    { id: 'i117', categoryId: 'c16', name: 'Pisco Sour Nacional', description: '', price: 3400, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i118', categoryId: 'c16', name: 'Pisco Alto del Carmen 35°', description: '', price: 3900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i119', categoryId: 'c16', name: 'Pisco Alto del Carmen Transparente', description: '', price: 4300, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i120', categoryId: 'c16', name: 'Pisco Mistral 35°', description: '', price: 3900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i121', categoryId: 'c16', name: 'Ramazzotti Spritz', description: '', price: 4900, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i122', categoryId: 'c16', name: 'Aperol Spritz', description: '', price: 4900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i123', categoryId: 'c16', name: 'Vodka Stolichnaya', description: '', price: 4500, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i124', categoryId: 'c16', name: 'Beefeater', description: '', price: 5900, photo: '', active: true, badge: '', order: 8 },
+    { id: 'i125', categoryId: 'c16', name: 'Johnnie Walker Red', description: '', price: 4900, photo: '', active: true, badge: '', order: 9 },
+    { id: 'i126', categoryId: 'c16', name: 'Johnnie Walker Black', description: '', price: 6900, photo: '', active: true, badge: '', order: 10 },
+    { id: 'i127', categoryId: 'c17', name: 'Cusqueña', description: '', price: 2900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i128', categoryId: 'c17', name: 'Corona', description: '', price: 2900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i129', categoryId: 'c17', name: 'Stella Artois', description: '', price: 2900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i130', categoryId: 'c17', name: 'Stella Artois Sin Alcohol', description: '', price: 2900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i131', categoryId: 'c17', name: 'Corona Sin Alcohol', description: '', price: 2900, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i132', categoryId: 'c17', name: 'Budweiser Sin Alcohol', description: '', price: 2900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i133', categoryId: 'c17', name: 'Schop Stella Artois 500cc', description: '', price: 4900, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i134', categoryId: 'c18', name: 'Casas Patronales Reserva Cabernet Sauvignon', description: 'Botella.', price: 10900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i135', categoryId: 'c18', name: 'Casas Patronales Reserva Carmenere', description: 'Botella.', price: 10900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i136', categoryId: 'c18', name: 'Casas Patronales Gran Reserva Cabernet Sauvignon', description: 'Botella.', price: 14900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i137', categoryId: 'c18', name: 'Casas Patronales Gran Reserva Carmenere', description: 'Botella.', price: 14900, photo: '', active: true, badge: '', order: 4 },
+    { id: 'i138', categoryId: 'c18', name: 'Invina Sierra Batuco Reserva Cabernet Sauvignon', description: 'Botella.', price: 9900, photo: '', active: true, badge: '', order: 5 },
+    { id: 'i139', categoryId: 'c18', name: 'Invina Sierra Batuco Reserva Carmenere', description: 'Botella.', price: 9900, photo: '', active: true, badge: '', order: 6 },
+    { id: 'i140', categoryId: 'c18', name: 'Invina Sierra Batuco Reserva Sauvignon Blanc', description: 'Botella.', price: 9900, photo: '', active: true, badge: '', order: 7 },
+    { id: 'i141', categoryId: 'c19', name: 'Copa Invina Sierra Batuco Reserva Carmenere', description: '', price: 2900, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i142', categoryId: 'c19', name: 'Copa Invina Sierra Batuco Reserva Cabernet Sauvignon', description: '', price: 2900, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i143', categoryId: 'c19', name: 'Copa Invina Sierra Batuco Reserva Sauvignon Blanc', description: '', price: 2900, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i144', categoryId: 'c20', name: 'Expresso', description: '', price: 1500, photo: '', active: true, badge: '', order: 1 },
+    { id: 'i145', categoryId: 'c20', name: 'Cortado', description: '', price: 2000, photo: '', active: true, badge: '', order: 2 },
+    { id: 'i146', categoryId: 'c20', name: 'Té', description: '', price: 1500, photo: '', active: true, badge: '', order: 3 },
+    { id: 'i147', categoryId: 'c20', name: 'Agua de Hierbas', description: '', price: 1500, photo: '', active: true, badge: '', order: 4 }
+  ]
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+  return DEFAULT_DATA;
+}
+
+let data = loadData();
+let currentMenu = null;
+
+function fmtPrice(n) {
+  return '$' + (n || 0).toLocaleString('es-CL');
+}
+
+function shadeColor(hex, percent) {
+  // percent: negative = darker, positive = lighter
+  const m = (hex || '').replace('#', '').match(/.{2}/g);
+  if (!m || m.length !== 3) return hex;
+  const rgb = m.map(h => parseInt(h, 16));
+  const adj = rgb.map(c => Math.max(0, Math.min(255, Math.round(c + (c * percent / 100)))));
+  return '#' + adj.map(c => c.toString(16).padStart(2, '0')).join('');
+}
+
+function applyTheme() {
+  const t = { ...DEFAULT_THEME, ...((data.config || {}).theme || {}) };
+  const r = document.documentElement.style;
+  r.setProperty('--bg', t.bgColor);
+  r.setProperty('--navbar', t.navColor);
+  r.setProperty('--card', t.cardColor);
+  r.setProperty('--card-hover', shadeColor(t.cardColor, -10));
+  r.setProperty('--text-light', t.textColor);
+  r.setProperty('--accent', t.accentColor);
+  const fontStack = `'${t.font}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+  r.setProperty('--font-body', fontStack);
+  r.setProperty('--font-display', fontStack);
+}
+
+function renderHome() {
+  applyTheme();
+  document.getElementById('home').style.display = 'flex';
+  document.getElementById('menu-view').style.display = 'none';
+  document.getElementById('back-btn').style.display = 'none';
+
+  // Logo and texts
+  const logoEl = document.getElementById('home-logo');
+  const topLogo = document.getElementById('topbar-logo');
+  if (data.config.logo) {
+    logoEl.innerHTML = `<img src="${data.config.logo}" alt="${data.config.name}">`;
+    topLogo.innerHTML = `<img src="${data.config.logo}" alt="${data.config.name}">`;
+  } else {
+    logoEl.textContent = data.config.name || 'La Overa';
+    topLogo.textContent = data.config.name || 'La Overa';
+  }
+  document.getElementById('home-tagline').textContent = data.config.tagline || '';
+  document.getElementById('footer-info').textContent = data.config.footer || '';
+
+  // Menus
+  const wrap = document.getElementById('menu-buttons');
+  wrap.innerHTML = '';
+  (data.config.menus || []).forEach(menu => {
+    const btn = document.createElement('button');
+    btn.className = 'menu-btn';
+    btn.textContent = menu;
+    btn.onclick = () => openMenu(menu);
+    wrap.appendChild(btn);
+  });
+}
+
+function openMenu(menu) {
+  currentMenu = menu;
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('menu-view').style.display = 'block';
+  document.getElementById('back-btn').style.display = 'flex';
+  window.scrollTo(0, 0);
+  renderMenu();
+}
+
+function renderMenu() {
+  const cats = (data.categories || [])
+    .filter(c => c.menu === currentMenu && c.active)
+    .sort((a, b) => a.order - b.order);
+
+  // Nav
+  const nav = document.getElementById('cat-nav');
+  nav.innerHTML = '';
+  cats.forEach(c => {
+    const a = document.createElement('a');
+    a.className = 'cat-link';
+    a.dataset.cat = c.id;
+    a.textContent = c.name;
+    a.onclick = () => {
+      const el = document.getElementById('sec-' + c.id);
+      if (el) {
+        // scroll-margin-top en .cat-section deja el espacio del header sticky
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+    nav.appendChild(a);
+  });
+
+  // Sections
+  const content = document.getElementById('cat-content');
+  content.innerHTML = '';
+
+  if (cats.length === 0) {
+    content.innerHTML = `<div class="empty-state">
+      <h3>Aún no hay categorías en este menú</h3>
+      <p>Agrega categorías y productos desde <a href="admin.html">el panel de administración</a></p>
+    </div>`;
+    return;
+  }
+
+  cats.forEach(cat => {
+    const items = (data.items || [])
+      .filter(it => it.categoryId === cat.id && it.active)
+      .sort((a, b) => a.order - b.order);
+
+    if (items.length === 0) return;
+
+    const section = document.createElement('div');
+    section.className = 'cat-section';
+    section.id = 'sec-' + cat.id;
+    section.innerHTML = `<h2>${escapeHtml(cat.name)}</h2><div class="items-grid" id="grid-${cat.id}"></div>`;
+    content.appendChild(section);
+
+    const grid = section.querySelector('.items-grid');
+    items.forEach(it => {
+      const card = document.createElement('div');
+      card.className = 'item-card' + (it.photo ? '' : ' no-photo');
+      card.innerHTML = `
+        ${it.badge ? `<span class="badge">${escapeHtml(it.badge)}</span>` : ''}
+        <div class="item-info">
+          <div>
+            <div class="item-title">${escapeHtml(it.name)}</div>
+            <div class="item-desc">${escapeHtml(it.description || '')}</div>
+          </div>
+          <div class="item-price">${fmtPrice(it.price)}</div>
+        </div>
+        ${it.photo ? `<div class="item-photo" style="background-image:url('${it.photo}')"></div>` : ''}
+      `;
+      card.onclick = () => openItem(it, cat);
+      grid.appendChild(card);
+    });
+  });
+
+  // Active section on scroll (la primera se marca activa adentro de setupScrollSpy)
+  setupScrollSpy(cats);
+}
+
+function setupScrollSpy(cats) {
+  const navEl = document.getElementById('cat-nav');
+  const items = cats.map(c => ({
+    id: c.id,
+    section: document.getElementById('sec-' + c.id),
+    link: navEl.querySelector(`[data-cat="${c.id}"]`)
+  })).filter(x => x.section && x.link);
+
+  // Cleanup listeners anteriores (importante al cambiar de menú)
+  if (window._spyHandler) {
+    window.removeEventListener('scroll', window._spyHandler);
+    document.removeEventListener('scroll', window._spyHandler, true);
+    window.removeEventListener('resize', window._spyHandler);
+  }
+
+  if (items.length === 0) return;
+
+  let lastActiveId = null;
+  let rafScheduled = false;
+
+  function compute() {
+    rafScheduled = false;
+    const isMobile = window.matchMedia('(max-width: 720px)').matches;
+    // Línea imaginaria un poco debajo del header sticky (topbar + nav)
+    const LINE = isMobile ? 110 : 130;
+
+    // La sección activa = la última cuyo top ya cruzó la línea hacia arriba
+    let active = items[0];
+    for (let i = 0; i < items.length; i++) {
+      const rect = items[i].section.getBoundingClientRect();
+      if (rect.top - LINE <= 0) {
+        active = items[i];
+      } else {
+        break;
+      }
+    }
+
+    if (active.id === lastActiveId) return;
+    lastActiveId = active.id;
+
+    items.forEach(it => it.link.classList.toggle('active', it === active));
+
+    // Auto-scroll del nav horizontal para mostrar el link activo
+    const linkLeft = active.link.offsetLeft;
+    const linkWidth = active.link.offsetWidth;
+    const navW = navEl.clientWidth;
+    navEl.scrollTo({
+      left: Math.max(0, linkLeft - navW / 2 + linkWidth / 2),
+      behavior: 'smooth'
+    });
+  }
+
+  function onScrollOrResize() {
+    if (rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(compute);
+  }
+
+  // Listen en window, document (con capture, atrapa scroll en cualquier elemento),
+  // y resize (para recalcular si cambia el tamaño de la ventana)
+  window._spyHandler = onScrollOrResize;
+  window.addEventListener('scroll', onScrollOrResize, { passive: true });
+  document.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
+  window.addEventListener('resize', onScrollOrResize, { passive: true });
+
+  // Estado inicial
+  compute();
+}
+
+function openItem(it, cat) {
+  document.getElementById('modal-cat').textContent = cat.name;
+  document.getElementById('modal-title').textContent = it.name;
+  document.getElementById('modal-desc').textContent = it.description || '';
+  document.getElementById('modal-price').textContent = fmtPrice(it.price);
+  const img = document.getElementById('modal-img');
+  if (it.photo) {
+    img.style.backgroundImage = `url('${it.photo}')`;
+    img.classList.remove('no-img');
+  } else {
+    img.classList.add('no-img');
+  }
+  const badge = document.getElementById('modal-badge');
+  if (it.badge) {
+    badge.textContent = it.badge;
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+function escapeHtml(str) {
+  return String(str || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Listeners
+document.getElementById('back-btn').onclick = renderHome;
+document.getElementById('modal-close').onclick = () => document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').onclick = (e) => {
+  if (e.target.id === 'modal') document.getElementById('modal').classList.remove('open');
+};
+
+// Refresh data if changed in admin (other tab)
+window.addEventListener('storage', (e) => {
+  if (e.key === STORAGE_KEY) {
+    data = loadData();
+    if (document.getElementById('menu-view').style.display === 'block') renderMenu();
+    else renderHome();
+  }
+});
+
+renderHome();
+</script>
+</body>
+</html>
