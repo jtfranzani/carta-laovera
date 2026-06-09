@@ -418,6 +418,14 @@
     <div id="view-apariencia" class="view" style="display:none">
       <h1 class="page-title">Apariencia</h1>
 
+      <div class="settings-card" style="margin-bottom:16px;background:linear-gradient(135deg, rgba(74,158,255,0.12), rgba(74,158,255,0.04));border:1px solid rgba(74,158,255,0.25);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <div style="color:#fff;font-weight:600;margin-bottom:4px">Preview en vivo activado</div>
+          <div class="hint">Los cambios se guardan automáticamente. Abrí la carta en otra ventana para verlos en tiempo real mientras los hacés.</div>
+        </div>
+        <button class="btn btn-primary" onclick="window.open('index.html', '_blank', 'noopener')">↗ Abrir carta en nueva ventana</button>
+      </div>
+
       <div class="settings-card" style="margin-bottom:20px">
         <h3 style="margin-bottom:14px;color:#fff;font-size:16px">Plantillas pre-armadas</h3>
         <div class="hint" style="margin-bottom:14px">Haz clic en una plantilla para aplicarla. Después puedes ajustar colores y fuente manualmente.</div>
@@ -447,17 +455,17 @@
 
         <div class="field-row">
           <div class="field">
-            <label>Color de fondo</label>
+            <label>Color de fondo (página)</label>
             <div style="display:flex;gap:8px;align-items:center">
               <input type="color" id="th-bgColor" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
               <input type="text" id="th-bgColorText" oninput="syncColor('bgColor')" style="flex:1">
             </div>
           </div>
           <div class="field">
-            <label>Color barra superior</label>
+            <label>Color fondo barra superior</label>
             <div style="display:flex;gap:8px;align-items:center">
-              <input type="color" id="th-navColor" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
-              <input type="text" id="th-navColorText" oninput="syncColor('navColor')" style="flex:1">
+              <input type="color" id="th-topbarBg" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
+              <input type="text" id="th-topbarBgText" oninput="syncColor('topbarBg')" style="flex:1">
             </div>
           </div>
         </div>
@@ -479,11 +487,20 @@
           </div>
         </div>
 
-        <div class="field">
-          <label>Color acento (logo, badges)</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input type="color" id="th-accentColor" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
-            <input type="text" id="th-accentColorText" oninput="syncColor('accentColor')" style="flex:1">
+        <div class="field-row">
+          <div class="field">
+            <label>Color botones home / textos oscuros</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="th-navColor" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
+              <input type="text" id="th-navColorText" oninput="syncColor('navColor')" style="flex:1">
+            </div>
+          </div>
+          <div class="field">
+            <label>Color acento (línea, badges)</label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="color" id="th-accentColor" oninput="onThemeChange()" style="width:50px;height:40px;border:none;background:transparent;cursor:pointer;padding:0">
+              <input type="text" id="th-accentColorText" oninput="syncColor('accentColor')" style="flex:1">
+            </div>
           </div>
         </div>
 
@@ -593,9 +610,12 @@
     </div>
     <div class="field">
       <label>Foto del producto</label>
-      <img id="it-photo-preview" class="photo-preview" style="display:none">
+      <div id="it-photo-wrap" style="display:none;position:relative;margin-bottom:8px">
+        <img id="it-photo-preview" class="photo-preview" style="display:block;margin-bottom:0">
+        <button type="button" onclick="removeItemPhoto()" title="Quitar foto" style="position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.7);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+      </div>
       <div class="photo-uploader" onclick="document.getElementById('it-photo-upload').click()">
-        Haz clic para subir foto
+        <span id="it-photo-uploader-label">Haz clic para subir foto</span>
       </div>
       <input type="file" id="it-photo-upload" accept="image/*" style="display:none">
       <div class="hint">Todas las fotos se recortan automáticamente a <b>1280×960 (proporción 4:3)</b> para que se vean uniformes en la carta. Se acepta cualquier tamaño y formato (excepto HEIC). El recorte es desde el centro.</div>
@@ -650,23 +670,24 @@
 const STORAGE_KEY = 'laovera_carta_v3';
 
 const DEFAULT_THEME = {
-  font: 'Inter',
-  bgColor: '#f1e8d0',
-  navColor: '#181513',
-  cardColor: '#b04948',
+  font: 'Manrope',
+  bgColor: '#e6d2a8',
+  topbarBg: '#e8dcc0',
+  navColor: '#2d1f17',
+  cardColor: '#a0522d',
   textColor: '#ffffff',
-  accentColor: '#e8c977'
+  accentColor: '#d4a017'
 };
 
 const PRESETS = {
-  'laovera': { name: 'La Overa Clásico', font: 'Inter', bgColor: '#f1e8d0', navColor: '#181513', cardColor: '#b04948', textColor: '#ffffff', accentColor: '#e8c977' },
-  'gourmedia': { name: 'Negro Premium', font: 'Inter', bgColor: '#f5f1e6', navColor: '#0a0a0a', cardColor: '#a8312f', textColor: '#ffffff', accentColor: '#d4af37' },
-  'bordo': { name: 'Bordo Elegante', font: 'Playfair Display', bgColor: '#f7f1e3', navColor: '#2e1414', cardColor: '#6b1c1c', textColor: '#f5e9d3', accentColor: '#c9a55a' },
-  'bosque': { name: 'Bosque', font: 'Montserrat', bgColor: '#f0ebdc', navColor: '#1f2e1b', cardColor: '#3b5f3a', textColor: '#ffffff', accentColor: '#d4af37' },
-  'cafe': { name: 'Café', font: 'Poppins', bgColor: '#f4ead5', navColor: '#2c1810', cardColor: '#6b4226', textColor: '#ffffff', accentColor: '#e8c977' },
-  'moderno': { name: 'Moderno', font: 'DM Sans', bgColor: '#fafafa', navColor: '#000000', cardColor: '#1a1a1a', textColor: '#ffffff', accentColor: '#ff6b35' },
-  'campo': { name: 'Campo Chileno', font: 'Oswald', bgColor: '#f5ead2', navColor: '#3d2817', cardColor: '#8b4513', textColor: '#f5ead2', accentColor: '#daa520' },
-  'overaSign': { name: 'Letrero Overa', font: 'Bebas Neue', bgColor: '#1a1410', navColor: '#0a0807', cardColor: '#b8862c', textColor: '#1a1410', accentColor: '#ffffff' }
+  'laovera': { name: 'La Overa Terracota', font: 'Manrope', bgColor: '#e6d2a8', topbarBg: '#e8dcc0', navColor: '#2d1f17', cardColor: '#a0522d', textColor: '#ffffff', accentColor: '#d4a017' },
+  'bordo': { name: 'Bordo Elegante', font: 'Playfair Display', bgColor: '#f7f1e3', topbarBg: '#2e1414', navColor: '#2e1414', cardColor: '#6b1c1c', textColor: '#f5e9d3', accentColor: '#c9a55a' },
+  'bosque': { name: 'Bosque', font: 'Montserrat', bgColor: '#f0ebdc', topbarBg: '#1f2e1b', navColor: '#1f2e1b', cardColor: '#3b5f3a', textColor: '#ffffff', accentColor: '#d4af37' },
+  'cafe': { name: 'Café', font: 'Poppins', bgColor: '#f4ead5', topbarBg: '#2c1810', navColor: '#2c1810', cardColor: '#6b4226', textColor: '#ffffff', accentColor: '#e8c977' },
+  'moderno': { name: 'Moderno B&N', font: 'DM Sans', bgColor: '#fafafa', topbarBg: '#000000', navColor: '#000000', cardColor: '#1a1a1a', textColor: '#ffffff', accentColor: '#ff6b35' },
+  'campo': { name: 'Campo Chileno', font: 'Oswald', bgColor: '#f5ead2', topbarBg: '#3d2817', navColor: '#3d2817', cardColor: '#8b4513', textColor: '#f5ead2', accentColor: '#daa520' },
+  'overaSign': { name: 'Letrero Overa', font: 'Bebas Neue', bgColor: '#1a1410', topbarBg: '#0a0807', navColor: '#0a0807', cardColor: '#b8862c', textColor: '#1a1410', accentColor: '#ffffff' },
+  'olivo': { name: 'Olivo Mediterráneo', font: 'Manrope', bgColor: '#efeadb', topbarBg: '#1f2a1c', navColor: '#1f2a1c', cardColor: '#556b2f', textColor: '#ffffff', accentColor: '#e8c977' }
 };
 
 const DEFAULT_DATA = {
@@ -1021,15 +1042,26 @@ function openItemModal(id) {
     document.getElementById('it-badge').value = editingItem.badge || '';
     document.getElementById('it-active').checked = editingItem.active !== false;
     const prev = document.getElementById('it-photo-preview');
-    if (editingItem.photo) { prev.src = editingItem.photo; prev.style.display = 'block'; }
-    else { prev.style.display = 'none'; prev.src = ''; }
+    const wrap = document.getElementById('it-photo-wrap');
+    const label = document.getElementById('it-photo-uploader-label');
+    if (editingItem.photo) {
+      prev.src = editingItem.photo;
+      wrap.style.display = 'block';
+      label.textContent = 'Reemplazar foto';
+    } else {
+      prev.src = '';
+      wrap.style.display = 'none';
+      label.textContent = 'Haz clic para subir foto';
+    }
   } else {
     document.getElementById('it-name').value = '';
     document.getElementById('it-desc').value = '';
     document.getElementById('it-price').value = '';
     document.getElementById('it-badge').value = '';
     document.getElementById('it-active').checked = true;
-    document.getElementById('it-photo-preview').style.display = 'none';
+    document.getElementById('it-photo-wrap').style.display = 'none';
+    document.getElementById('it-photo-preview').src = '';
+    document.getElementById('it-photo-uploader-label').textContent = 'Haz clic para subir foto';
     // Pre-select current filter category if set
     const currentCat = document.getElementById('filter-cat').value;
     if (currentCat) document.getElementById('it-cat').value = currentCat;
@@ -1047,8 +1079,9 @@ function saveItem() {
   if (!name) { toast('El nombre es obligatorio', true); return; }
   const categoryId = document.getElementById('it-cat').value;
   if (!categoryId) { toast('Selecciona una categoría', true); return; }
+  const photoWrap = document.getElementById('it-photo-wrap');
   const photoPreview = document.getElementById('it-photo-preview');
-  const photo = photoPreview.style.display === 'block' ? photoPreview.src : '';
+  const photo = photoWrap.style.display !== 'none' && photoPreview.src ? photoPreview.src : '';
 
   if (editingItem) {
     editingItem.name = name;
@@ -1190,13 +1223,22 @@ document.getElementById('it-photo-upload').onchange = async (e) => {
     });
     const img = document.getElementById('it-photo-preview');
     img.src = dataUrl;
-    img.style.display = 'block';
+    document.getElementById('it-photo-wrap').style.display = 'block';
+    document.getElementById('it-photo-uploader-label').textContent = 'Reemplazar foto';
     toast(`Imagen recortada a 1280×960 (${originalMB}MB → ${approxKB(dataUrl)}KB)`);
   } catch (err) {
     toast(err.message, true);
   }
   e.target.value = '';
 };
+
+// Quitar foto del producto (sin guardar todavía — el cambio se aplica al hacer "Guardar")
+function removeItemPhoto() {
+  document.getElementById('it-photo-wrap').style.display = 'none';
+  document.getElementById('it-photo-preview').src = '';
+  document.getElementById('it-photo-uploader-label').textContent = 'Haz clic para subir foto';
+  toast('Foto quitada — recordá Guardar');
+}
 
 // ===== CATEGORÍAS =====
 function renderCategorias() {
@@ -1418,7 +1460,7 @@ function getTheme() {
 
 function renderApariencia() {
   const t = getTheme();
-  ['font','bgColor','navColor','cardColor','textColor','accentColor'].forEach(k => {
+  ['font','bgColor','topbarBg','navColor','cardColor','textColor','accentColor'].forEach(k => {
     const el = document.getElementById('th-' + k);
     if (el) el.value = t[k];
     const txt = document.getElementById('th-' + k + 'Text');
@@ -1451,22 +1493,35 @@ function renderPresets() {
 function applyPreset(key) {
   const p = PRESETS[key];
   if (!p) return;
-  ['font','bgColor','navColor','cardColor','textColor','accentColor'].forEach(k => {
+  ['font','bgColor','topbarBg','navColor','cardColor','textColor','accentColor'].forEach(k => {
     const el = document.getElementById('th-' + k);
     if (el) el.value = p[k];
     const txt = document.getElementById('th-' + k + 'Text');
     if (txt) txt.value = p[k];
   });
   onThemeChange();
-  toast(`Plantilla "${p.name}" aplicada (recuerda guardar)`);
+  toast(`Plantilla "${p.name}" aplicada`);
+}
+
+let _themeSaveTimer = null;
+function autoSaveTheme() {
+  // Debounce: guardar 350ms después del último cambio para evitar saturar
+  // las pestañas abiertas con la carta (que se actualizan via storage event).
+  clearTimeout(_themeSaveTimer);
+  _themeSaveTimer = setTimeout(() => {
+    if (!data.config) data.config = {};
+    data.config.theme = readThemeFromForm();
+    saveData();
+  }, 350);
 }
 
 function onThemeChange() {
-  ['bgColor','navColor','cardColor','textColor','accentColor'].forEach(k => {
+  ['bgColor','topbarBg','navColor','cardColor','textColor','accentColor'].forEach(k => {
     const c = document.getElementById('th-' + k).value;
     document.getElementById('th-' + k + 'Text').value = c;
   });
   updateThemePreview(readThemeFromForm());
+  autoSaveTheme();
 }
 
 function syncColor(field) {
@@ -1474,6 +1529,7 @@ function syncColor(field) {
   if (/^#[0-9a-fA-F]{6}$/.test(txt)) {
     document.getElementById('th-' + field).value = txt;
     updateThemePreview(readThemeFromForm());
+    autoSaveTheme();
   }
 }
 
@@ -1481,6 +1537,7 @@ function readThemeFromForm() {
   return {
     font: document.getElementById('th-font').value,
     bgColor: document.getElementById('th-bgColor').value,
+    topbarBg: document.getElementById('th-topbarBg').value,
     navColor: document.getElementById('th-navColor').value,
     cardColor: document.getElementById('th-cardColor').value,
     textColor: document.getElementById('th-textColor').value,
@@ -1501,25 +1558,41 @@ function updateThemePreview(t) {
   const card = document.getElementById('prev-card');
   const desc = document.getElementById('prev-desc');
   if (!nav) return;
-  nav.style.background = t.navColor;
+  // Para determinar si el texto del topbar debería ser claro u oscuro,
+  // medimos la luminancia del fondo del topbar
+  const topbar = t.topbarBg || t.bgColor;
+  const topbarTextColor = isDarkColor(topbar) ? t.textColor : t.navColor;
+  nav.style.background = topbar;
   nav.style.fontFamily = fontStack;
-  nav.style.color = t.textColor;
-  logo.style.color = t.accentColor;
+  nav.style.color = topbarTextColor;
+  nav.style.borderBottom = `2px solid ${t.accentColor}`;
+  logo.style.color = isDarkColor(topbar) ? t.accentColor : t.navColor;
   bg.style.background = t.bgColor;
   bg.style.fontFamily = fontStack;
-  title.style.color = t.cardColor;
+  title.style.color = t.navColor;
   card.style.background = t.cardColor;
   card.style.color = t.textColor;
   desc.style.color = t.textColor;
   desc.style.opacity = '0.78';
 }
 
+// Heurística para saber si un color hex es "oscuro" (luminancia < 0.5)
+function isDarkColor(hex) {
+  const m = (hex || '').replace('#', '').match(/.{2}/g);
+  if (!m || m.length !== 3) return false;
+  const [r, g, b] = m.map(h => parseInt(h, 16) / 255);
+  const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+  return lum < 0.55;
+}
+
 function saveTheme() {
-  const t = readThemeFromForm();
+  // Los cambios ya se guardan automáticamente con autoSaveTheme().
+  // Este botón fuerza un guardado inmediato (sin esperar el debounce).
+  clearTimeout(_themeSaveTimer);
   if (!data.config) data.config = {};
-  data.config.theme = t;
+  data.config.theme = readThemeFromForm();
   saveData();
-  toast('Apariencia guardada — refresca la carta para ver los cambios');
+  toast('Apariencia guardada');
 }
 
 function resetTheme() {
