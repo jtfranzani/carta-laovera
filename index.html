@@ -849,12 +849,25 @@ function renderHome() {
   // Logo and texts
   const logoEl = document.getElementById('home-logo');
   const topLogo = document.getElementById('topbar-logo');
+  const restoName = data.config.name || 'La Overa';
+
+  // Home siempre usa el logo principal (fondo claro)
   if (data.config.logo) {
-    logoEl.innerHTML = `<img src="${data.config.logo}" alt="${data.config.name}">`;
-    topLogo.innerHTML = `<img src="${data.config.logo}" alt="${data.config.name}">`;
+    logoEl.innerHTML = `<img src="${data.config.logo}" alt="${restoName}">`;
   } else {
-    logoEl.textContent = data.config.name || 'La Overa';
-    topLogo.textContent = data.config.name || 'La Overa';
+    logoEl.textContent = restoName;
+  }
+
+  // Topbar: si su fondo es oscuro y hay logoDark cargado, usa esa versión
+  const t = { ...DEFAULT_THEME, ...((data.config || {}).theme || {}) };
+  const topbarBg = t.topbarBg || t.bgColor;
+  const topLogoSrc = (isDarkColor(topbarBg) && data.config.logoDark)
+    ? data.config.logoDark
+    : data.config.logo;
+  if (topLogoSrc) {
+    topLogo.innerHTML = `<img src="${topLogoSrc}" alt="${restoName}">`;
+  } else {
+    topLogo.textContent = restoName;
   }
   document.getElementById('home-tagline').textContent = data.config.tagline || '';
   document.getElementById('footer-info').textContent = data.config.footer || '';

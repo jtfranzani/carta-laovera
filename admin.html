@@ -549,13 +549,22 @@
           <input type="text" id="cfg-footer">
         </div>
         <div class="field">
-          <label>Logo</label>
+          <label>Logo principal (para fondos claros)</label>
           <div id="logo-preview-wrap"></div>
           <div class="photo-uploader" onclick="document.getElementById('logo-upload').click()">
-            Haz clic para subir el logo (recomendado 1024×1024 px)
+            Haz clic para subir el logo principal (recomendado 1024×1024 px, transparente)
           </div>
           <input type="file" id="logo-upload" accept="image/*" style="display:none">
-          <div class="hint">Si no subes logo, se mostrará el nombre del restaurante.</div>
+          <div class="hint">Se usa en la pantalla home y en el topbar cuando el fondo del topbar es claro. Si no subes logo, se muestra el nombre del restaurante.</div>
+        </div>
+        <div class="field">
+          <label>Logo para fondo oscuro (opcional)</label>
+          <div id="logo-dark-preview-wrap"></div>
+          <div class="photo-uploader" onclick="document.getElementById('logo-dark-upload').click()">
+            Haz clic para subir versión clara del logo (para topbar oscuro)
+          </div>
+          <input type="file" id="logo-dark-upload" accept="image/*" style="display:none">
+          <div class="hint">Si elegís un color oscuro de fondo para el topbar, subí acá una versión del logo con letras claras (blanco o crema). Si no, el topbar usa el logo principal.</div>
         </div>
         <div class="field">
           <label>Menús</label>
@@ -1371,11 +1380,21 @@ function renderConfig() {
 }
 
 function renderLogoPreview() {
+  // Logo principal: fondo blanco para que se vean letras oscuras
   const wrap = document.getElementById('logo-preview-wrap');
   wrap.innerHTML = '';
   if (data.config.logo) {
     wrap.innerHTML = `<img src="${data.config.logo}" style="max-width:120px;max-height:120px;border-radius:8px;margin-bottom:8px;background:#fff;padding:8px">
       <button class="btn btn-danger" style="margin-left:12px;vertical-align:top" onclick="removeLogo()">Quitar logo</button>`;
+  }
+  // Logo dark: fondo oscuro para que se vean letras claras
+  const wrapDark = document.getElementById('logo-dark-preview-wrap');
+  if (wrapDark) {
+    wrapDark.innerHTML = '';
+    if (data.config.logoDark) {
+      wrapDark.innerHTML = `<img src="${data.config.logoDark}" style="max-width:120px;max-height:120px;border-radius:8px;margin-bottom:8px;background:#2c3a25;padding:8px">
+        <button class="btn btn-danger" style="margin-left:12px;vertical-align:top" onclick="removeLogoDark()">Quitar logo oscuro</button>`;
+    }
   }
 }
 
@@ -1384,6 +1403,13 @@ function removeLogo() {
   saveData();
   renderLogoPreview();
   toast('Logo eliminado');
+}
+
+function removeLogoDark() {
+  data.config.logoDark = '';
+  saveData();
+  renderLogoPreview();
+  toast('Logo para fondo oscuro eliminado');
 }
 
 document.getElementById('logo-upload').onchange = async (e) => {
@@ -1398,6 +1424,24 @@ document.getElementById('logo-upload').onchange = async (e) => {
     if (saveData()) {
       renderLogoPreview();
       toast(`Logo actualizado (${originalMB}MB → ${approxKB(dataUrl)}KB)`);
+    }
+  } catch (err) {
+    toast(err.message, true);
+  }
+  e.target.value = '';
+};
+
+document.getElementById('logo-dark-upload').onchange = async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const originalMB = (f.size / 1024 / 1024).toFixed(1);
+  toast('Procesando logo para fondo oscuro...');
+  try {
+    const dataUrl = await compressImage(f, { maxWidth: 512, maxHeight: 512, quality: 0.92, format: 'image/png' });
+    data.config.logoDark = dataUrl;
+    if (saveData()) {
+      renderLogoPreview();
+      toast(`Logo oscuro actualizado (${originalMB}MB → ${approxKB(dataUrl)}KB)`);
     }
   } catch (err) {
     toast(err.message, true);
