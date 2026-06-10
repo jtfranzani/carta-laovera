@@ -7,6 +7,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Bebas+Neue&family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700;800&family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK (compat para integración simple) -->
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-auth-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDBesN16l8z5qAJKm709LCmg35K73en2z4",
+  authDomain: "la-overa-carta.firebaseapp.com",
+  projectId: "la-overa-carta",
+  storageBucket: "la-overa-carta.firebasestorage.app",
+  messagingSenderId: "384984338753",
+  appId: "1:384984338753:web:72602123206a3fbe14d1c0"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+window.fbDb = firebase.firestore();
+window.fbAuth = firebase.auth();
+</script>
+
 <style>
   :root {
     --bg: #2c2e35;
@@ -357,7 +376,28 @@
 </head>
 <body>
 
-<div class="app">
+<!-- LOGIN SCREEN: overlay que tapa todo hasta que el usuario inicie sesión -->
+<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px">
+  <div style="background:var(--bg-card);padding:32px;border-radius:12px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid var(--border)">
+    <h2 style="color:#fff;margin-bottom:6px;font-size:22px">La Overa · Admin</h2>
+    <p style="color:var(--text-muted);margin-bottom:24px;font-size:13px">Iniciá sesión para editar la carta</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-error" style="color:var(--danger);font-size:13px;margin-bottom:12px;display:none;padding:8px 10px;background:rgba(232,93,93,0.1);border-radius:6px;border:1px solid rgba(232,93,93,0.3)"></div>
+    <button class="btn btn-primary" onclick="doLogin()" id="login-btn" style="width:100%;padding:14px;font-size:14px;font-weight:600">Entrar</button>
+    <div style="margin-top:18px;font-size:12px;color:var(--text-muted);text-align:center;line-height:1.5">
+      ¿Olvidaste la contraseña? Pedile a quien armó el sistema que la resetee desde Firebase Console.
+    </div>
+  </div>
+</div>
+
+<div class="app" style="display:none">
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">
@@ -386,6 +426,7 @@
       <button class="icon-btn" title="Exportar JSON" onclick="exportData()">⤓</button>
       <button class="icon-btn" title="Importar JSON" onclick="document.getElementById('import-file').click()">⤒</button>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="icon-btn" title="Cerrar sesión" onclick="doLogout()" style="color:var(--danger)">⏻</button>
     </div>
   </aside>
 
@@ -891,17 +932,93 @@ function loadData() {
 }
 
 function saveData() {
+  // 1) Guardar en localStorage (backup local + cache de fotos)
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    return true;
   } catch (err) {
     const isQuota = err && (err.name === 'QuotaExceededError' || err.code === 22 || /quota/i.test(err.message));
     if (isQuota) {
-      toast('⚠ Almacenamiento del navegador lleno. Descarga un backup (ícono ⤓) y considera hostear el sitio para liberar espacio.', true);
+      toast('⚠ Almacenamiento del navegador lleno. Las fotos pesan mucho — exportá backup.', true);
     } else {
-      toast('Error guardando: ' + (err.message || err), true);
+      toast('Error guardando localmente: ' + (err.message || err), true);
     }
     return false;
+  }
+  // 2) Guardar en Firestore (sin las fotos de items para no inflar el doc)
+  if (window.fbDb && window.fbAuth && window.fbAuth.currentUser) {
+    const clean = JSON.parse(JSON.stringify(data));
+    (clean.items || []).forEach(it => { delete it.photo; });
+    window.fbDb.collection('restaurant').doc('main').set(clean)
+      .catch(err => toast('Error en la nube: ' + err.message, true));
+  }
+  return true;
+}
+
+// Sincronización en vivo desde Firestore (refleja cambios hechos en otros dispositivos)
+function startFirestoreSync() {
+  if (!window.fbDb) return;
+  window.fbDb.collection('restaurant').doc('main').onSnapshot((snap) => {
+    if (!snap.exists) return;
+    const remote = snap.data();
+    // Preservar las fotos locales
+    const photos = {};
+    (data.items || []).forEach(it => { if (it.photo) photos[it.id] = it.photo; });
+    (remote.items || []).forEach(it => { if (photos[it.id]) it.photo = photos[it.id]; });
+    data = remote;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+    // Refrescar la vista actual
+    populateMenuFilters();
+    if (currentView === 'items') renderItems();
+    else if (currentView === 'categorias') renderCategorias();
+    else if (currentView === 'config') renderConfig();
+    else if (currentView === 'apariencia') renderApariencia();
+  }, (err) => console.error('Firestore sync error:', err));
+}
+
+// ===== AUTH =====
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  const errBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-btn');
+  errBox.style.display = 'none';
+  if (!email || !pw) { errBox.textContent = 'Email y contraseña son obligatorios'; errBox.style.display = 'block'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Entrando...';
+  try {
+    await window.fbAuth.signInWithEmailAndPassword(email, pw);
+    // onAuthStateChanged se encarga de mostrar el admin
+  } catch (err) {
+    let msg = err.message;
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') msg = 'Email o contraseña incorrectos';
+    if (err.code === 'auth/invalid-email') msg = 'Email mal formado';
+    if (err.code === 'auth/user-not-found') msg = 'No existe usuario con ese email';
+    if (err.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Esperá un rato.';
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+  }
+}
+
+async function doLogout() {
+  if (!confirm('¿Cerrar sesión?')) return;
+  await window.fbAuth.signOut();
+  // onAuthStateChanged se encarga de mostrar el login
+}
+
+// Migración inicial: si Firestore está vacío al primer login, subir productos actuales
+async function maybeMigrate() {
+  if (!window.fbDb) return;
+  const snap = await window.fbDb.collection('restaurant').doc('main').get();
+  if (!snap.exists) {
+    const itemCount = (data.items || []).length;
+    if (itemCount && confirm(`Es la primera vez que entrás. ¿Subir los ${itemCount} productos actuales a Firebase para que los vean todos los clientes?`)) {
+      const clean = JSON.parse(JSON.stringify(data));
+      (clean.items || []).forEach(it => { delete it.photo; });
+      await window.fbDb.collection('restaurant').doc('main').set(clean);
+      toast('Migración completa — los datos están en la nube');
+    }
   }
 }
 
@@ -1730,9 +1847,28 @@ function resetAllData() {
 document.getElementById('item-modal').onclick = (e) => { if (e.target.id === 'item-modal') closeItemModal(); };
 document.getElementById('cat-modal').onclick = (e) => { if (e.target.id === 'cat-modal') closeCatModal(); };
 
-// INIT
-populateMenuFilters();
-renderItems();
+// INIT: esperar a que Firebase Auth resuelva, después mostrar app o login
+let _initDone = false;
+window.fbAuth.onAuthStateChanged(async (user) => {
+  const loginScreen = document.getElementById('login-screen');
+  const appEl = document.querySelector('.app');
+  if (user) {
+    // Logueado
+    loginScreen.style.display = 'none';
+    appEl.style.display = '';
+    if (!_initDone) {
+      _initDone = true;
+      populateMenuFilters();
+      renderItems();
+      await maybeMigrate();
+      startFirestoreSync();
+    }
+  } else {
+    // No logueado
+    loginScreen.style.display = 'flex';
+    appEl.style.display = 'none';
+  }
+});
 </script>
 </body>
 </html>

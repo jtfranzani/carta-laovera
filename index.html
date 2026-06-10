@@ -7,6 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Bebas+Neue&family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;700;800&family=Manrope:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK (compat para integración simple) -->
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDBesN16l8z5qAJKm709LCmg35K73en2z4",
+  authDomain: "la-overa-carta.firebaseapp.com",
+  projectId: "la-overa-carta",
+  storageBucket: "la-overa-carta.firebasestorage.app",
+  messagingSenderId: "384984338753",
+  appId: "1:384984338753:web:72602123206a3fbe14d1c0"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+window.fbDb = firebase.firestore();
+</script>
+
 <style>
   :root {
     --bg: #e6d2a8;
@@ -1067,7 +1084,7 @@ document.getElementById('modal').onclick = (e) => {
   if (e.target.id === 'modal') document.getElementById('modal').classList.remove('open');
 };
 
-// Refresh data if changed in admin (other tab)
+// Refresh data if changed in admin (other tab, mismo navegador)
 window.addEventListener('storage', (e) => {
   if (e.key === STORAGE_KEY) {
     data = loadData();
@@ -1076,7 +1093,28 @@ window.addEventListener('storage', (e) => {
   }
 });
 
+// Sincronización en vivo desde Firestore (cualquier dispositivo)
+function startFirestoreSync() {
+  if (!window.fbDb) return;
+  window.fbDb.collection('restaurant').doc('main').onSnapshot((snap) => {
+    if (!snap.exists) return;
+    const remote = snap.data();
+    // Preservar las fotos locales (no se suben a Firestore por costo de bandwidth)
+    const photos = {};
+    (data.items || []).forEach(it => { if (it.photo) photos[it.id] = it.photo; });
+    (remote.items || []).forEach(it => { if (photos[it.id]) it.photo = photos[it.id]; });
+    data = remote;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+    // Re-render en la vista que corresponda
+    if (document.getElementById('menu-view').style.display === 'block') renderMenu();
+    else renderHome();
+  }, (err) => {
+    console.error('Firestore sync error:', err);
+  });
+}
+
 renderHome();
+startFirestoreSync();
 </script>
 </body>
 </html>
