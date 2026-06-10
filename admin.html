@@ -966,6 +966,7 @@ function startFirestoreSync() {
     (remote.items || []).forEach(it => { if (photos[it.id]) it.photo = photos[it.id]; });
     data = remote;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+    updateDocTitle();
     // Refrescar la vista actual
     populateMenuFilters();
     if (currentView === 'items') renderItems();
@@ -1611,7 +1612,12 @@ function saveConfig() {
   data.config.tagline = document.getElementById('cfg-tagline').value.trim();
   data.config.footer = document.getElementById('cfg-footer').value.trim();
   saveData();
+  updateDocTitle();
   toast('Configuración guardada');
+}
+
+function updateDocTitle() {
+  document.title = `${(data.config && data.config.name) || 'La Overa'} · Admin`;
 }
 
 // ===== APARIENCIA =====
@@ -1860,6 +1866,7 @@ window.fbAuth.onAuthStateChanged(async (user) => {
       _initDone = true;
       populateMenuFilters();
       renderItems();
+      updateDocTitle();
       await maybeMigrate();
       startFirestoreSync();
     }

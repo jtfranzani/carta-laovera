@@ -24,7 +24,12 @@ firebase.initializeApp(FIREBASE_CONFIG);
 window.fbDb = firebase.firestore();
 </script>
 
+<script>document.documentElement.classList.add('theme-pending');</script>
+
 <style>
+  /* Anti-FOUC: oculta la página hasta aplicar el tema definitivo */
+  html.theme-pending body { visibility: hidden; }
+
   :root {
     --bg: #e6d2a8;
     --topbar-bg: #e8dcc0;
@@ -859,6 +864,8 @@ function applyTheme() {
 
 function renderHome() {
   applyTheme();
+  // Título dinámico de la pestaña del navegador (tomado del Nombre del restaurante)
+  document.title = `${data.config.name || 'La Overa'} · Carta`;
   document.getElementById('home').style.display = 'flex';
   document.getElementById('menu-view').style.display = 'none';
   document.getElementById('back-btn').style.display = 'none';
@@ -1108,10 +1115,22 @@ function startFirestoreSync() {
     // Re-render en la vista que corresponda
     if (document.getElementById('menu-view').style.display === 'block') renderMenu();
     else renderHome();
+    revealPage();
   }, (err) => {
     console.error('Firestore sync error:', err);
+    revealPage();
   });
 }
+
+// Anti-FOUC: revela la página cuando el tema definitivo ya está aplicado
+let themeRevealed = false;
+function revealPage() {
+  if (themeRevealed) return;
+  themeRevealed = true;
+  document.documentElement.classList.remove('theme-pending');
+}
+// Tope de seguridad: si Firestore tarda más de 1.2s, muestra el tema cacheado
+setTimeout(revealPage, 1200);
 
 renderHome();
 startFirestoreSync();
